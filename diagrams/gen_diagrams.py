@@ -349,237 +349,228 @@ def diagram_simple():
 
 # ═════════════════════════════════════════════════════════════════════════════
 # DIAGRAM 2 — 555 astable 20 Hz gated by GPIO 22
-# Layout (all coordinates in data units):
 #
-#   5 V rail ────────────────────────────────────  y = 7.0
-#   GPIO 22 / RST pull-up node  ────────────────  y = 5.8
-#   IC top pins (VCC / RST)     ────────────────  y = 4.0  (ic_top)
-#   DIS (pin 7)                 ────────────────  y = 2.8
-#   IC centre                   ────────────────  y = 1.0  (ic_cy)
-#   OUT (pin 3) / THR (pin 6)   ────────────────  y = 0.0
-#   TRG (pin 2)                 ────────────────  y = -1.0
-#   GND (pin 1)                 ────────────────  y = -2.0  (ic_bot)
+# Column layout (data units)
+#  Timing network      x = -2.5
+#  IC centre           x =  4.5   (left=3.0, right=6.0)
+#  C2 bypass cap       x =  7.5
+#  R3 + Q1             x =  9.0  (base)
+#  Relay coil          x = 11.5
+#  D1 flyback          x = 13.2
+#  Bell / NO contact   x = 16.0
 #
-#   IC left  x = 0.8,  IC right x = 3.2
-#   Timing network (R1, R2, C1) at x = -1.5
-#   C2 (bypass) at x = 4.5
-#   R3 + Q1   centred around x = 6.0
-#   Relay coil at x = 8.2
-#   D1 (flyback) at x = 9.2  (1 unit right of coil — no overlap)
-#   Relay switch + bell at x = 11.5
+# Row layout (data units)
+#  5 V terminal (VCC pin)      y =  5.5
+#  RST / GPIO junction         y =  6.5   (GPIO wire runs here — clears all
+#  R_pu (top at 5V, bot=6.5)            vertical wires which top out at 5.5)
+#  5 V terminal (R_pu top)     y =  8.0
+#  IC top pins                 y =  4.5
+#  DIS (pin 7)                 y =  3.0
+#  THR (pin 6)                 y =  0.8
+#  OUT (pin 3)                 y =  0.8
+#  TRG (pin 2)                 y = -0.6
+#  GND (pin 1)                 y = -1.8
 # ═════════════════════════════════════════════════════════════════════════════
 def diagram_555():
     fig, ax = make_fig(
         "Bell Wiring — Option 2: 555 Astable at 20 Hz, Gated by GPIO 22\n"
         "Authentic mechanical ring — clapper oscillates at 20 Hz during ring cadence"
     )
-    ax.set_xlim(-3.5, 16.0)
-    ax.set_ylim(-6.0, 11.0)
+    fig.set_size_inches(15, 10)
+    ax.set_xlim(-5.5, 20.5)
+    ax.set_ylim(-6.5, 12.0)
 
     # ── 555 IC box ────────────────────────────────────────────────────────────
-    ic_cx, ic_cy = 2.0, 1.0
-    ic_w, ic_h   = 2.4, 6.0
+    ic_cx, ic_cy = 4.5, 1.0
+    ic_w, ic_h   = 3.0, 7.0
     ic_box(ax, ic_cx, ic_cy, w=ic_w, h=ic_h)
-    ic_left  = ic_cx - ic_w / 2   # 0.8
-    ic_right = ic_cx + ic_w / 2   # 3.2
-    ic_top   = ic_cy + ic_h / 2   # 4.0
-    ic_bot   = ic_cy - ic_h / 2   # -2.0
+    ic_left  = ic_cx - ic_w / 2   # 3.0
+    ic_right = ic_cx + ic_w / 2   # 6.0
+    ic_top   = ic_cy + ic_h / 2   # 4.5
+    ic_bot   = ic_cy - ic_h / 2   # -2.5
 
-    # ── Pin stubs (world coordinates) ────────────────────────────────────────
-    # Left-side pins
-    p_GND = (ic_left, ic_bot + 0.6)   # pin 1  y = -1.4
-    p_TRG = (ic_left, ic_bot + 1.6)   # pin 2  y = -0.4
-    p_THR = (ic_left, ic_bot + 2.8)   # pin 6  y =  0.8
-    p_DIS = (ic_left, ic_top - 1.2)   # pin 7  y =  2.8
-    # Right-side pins
-    p_CTL = (ic_right, ic_bot + 1.6)  # pin 5  y = -0.4
-    p_OUT = (ic_right, ic_bot + 2.8)  # pin 3  y =  0.8
-    # Top pins
-    p_VCC = (ic_cx - 0.55, ic_top)    # pin 8
-    p_RST = (ic_cx + 0.55, ic_top)    # pin 4
+    # ── Pin stub world-coordinates ────────────────────────────────────────────
+    p_GND = (ic_left, ic_bot + 0.7)   # pin 1  y = -1.8
+    p_TRG = (ic_left, ic_bot + 1.9)   # pin 2  y = -0.6
+    p_THR = (ic_left, ic_bot + 3.3)   # pin 6  y =  0.8
+    p_DIS = (ic_left, ic_top - 1.5)   # pin 7  y =  3.0
+    p_CTL = (ic_right, ic_bot + 1.9)  # pin 5  y = -0.6
+    p_OUT = (ic_right, ic_bot + 3.3)  # pin 3  y =  0.8
+    p_VCC = (ic_cx - 0.6, ic_top)     # pin 8  x = 3.9
+    p_RST = (ic_cx + 0.6, ic_top)     # pin 4  x = 5.1
 
-    # Label each pin inside the IC box edge
-    lbl = {"GND":"1 GND","TRG":"2 TRG","THR":"6 THR","DIS":"7 DIS",
-           "VCC":"8 VCC","RST":"4 RST","CTL":"5 CTL","OUT":"3 OUT"}
-    for name, pt in [("GND",p_GND),("TRG",p_TRG),("THR",p_THR),("DIS",p_DIS)]:
-        ax.text(pt[0]+0.14, pt[1], lbl[name], ha="left", va="center",
-                fontsize=6.5, color="#333")
-    for name, pt in [("CTL",p_CTL),("OUT",p_OUT)]:
-        ax.text(pt[0]-0.14, pt[1], lbl[name], ha="right", va="center",
-                fontsize=6.5, color="#333")
-    for name, pt in [("VCC",p_VCC),("RST",p_RST)]:
-        ax.text(pt[0], pt[1]-0.25, lbl[name], ha="center", va="top",
-                fontsize=6.5, color="#333")
+    # Pin labels — placed inside the IC body, away from the edges
+    for name, pt, side in [
+            ("GND", p_GND, "left"),("TRG", p_TRG, "left"),
+            ("THR", p_THR, "left"),("DIS", p_DIS, "left")]:
+        lbl = {"GND":"1 GND","TRG":"2 TRG","THR":"6 THR","DIS":"7 DIS"}[name]
+        ax.text(pt[0]+0.18, pt[1], lbl, ha="left", va="center",
+                fontsize=7, color="#333")
+    for name, pt in [("CTL", p_CTL), ("OUT", p_OUT)]:
+        lbl = {"CTL":"5 CTL","OUT":"3 OUT"}[name]
+        ax.text(pt[0]-0.18, pt[1], lbl, ha="right", va="center",
+                fontsize=7, color="#333")
+    # Top pin labels — below the pin stub, inside the box
+    ax.text(p_VCC[0], p_VCC[1]-0.3, "8 VCC", ha="center", va="top",
+            fontsize=7, color="#333")
+    ax.text(p_RST[0], p_RST[1]-0.3, "4 RST", ha="center", va="top",
+            fontsize=7, color="#333")
 
-    # ── 5 V rail at y = 7.0 ──────────────────────────────────────────────────
-    vcc_y = 7.0
-    # VCC pin wire up to rail
-    wire(ax, p_VCC[0], p_VCC[1], p_VCC[0], vcc_y)
-    dot(ax, p_VCC[0], vcc_y)
-    # 5 V terminal
-    open_terminal(ax, p_VCC[0], vcc_y, "5 V", loc="top")
+    # ── IC VCC (pin 8) — short wire up to its own 5 V terminal ───────────────
+    wire(ax, p_VCC[0], p_VCC[1], p_VCC[0], p_VCC[1]+1.0)
+    open_terminal(ax, p_VCC[0], p_VCC[1]+1.0, "5 V", loc="top")
 
-    # ── RST (pin 4) pull-up network ──────────────────────────────────────────
-    # Pull-up resistor sits to the RIGHT of the IC, well clear of VCC label
-    rpu_x   = 5.0    # x-position of pull-up resistor column
-    gpio_y  = 5.8    # y of GPIO 22 wire and pull-up junction node
+    # ── Timing network: R1, R2, C1 at x = -2.5 ───────────────────────────────
+    # The top of the timing column is at y ≈ 5.0 — safely BELOW the GPIO wire
+    # at y = 6.5, so there is no wire crossing.
+    tcol_x = -2.5
 
-    # Wire RST pin up then right to rpu_x column at vcc_y, resistor drops to gpio_y
-    wire(ax, p_RST[0], p_RST[1], p_RST[0], vcc_y)
-    dot(ax, p_RST[0], vcc_y)
-    wire(ax, p_RST[0], vcc_y, rpu_x, vcc_y)          # along 5 V rail to rpu_x
-    dot(ax, rpu_x, vcc_y)
-    resistor(ax, rpu_x, vcc_y, rpu_x, gpio_y,
-             label="R_pu\n10 kΩ", label_side="right")
-    dot(ax, rpu_x, gpio_y)
+    # 5 V terminal at top of timing column (separate from IC VCC terminal)
+    r1_top_y = p_DIS[1] + 1.2   # y = 4.2
+    wire(ax, tcol_x, r1_top_y, tcol_x, r1_top_y + 0.8)
+    open_terminal(ax, tcol_x, r1_top_y + 0.8, "5 V", loc="top")
 
-    # Horizontal wire from rpu_x back to RST pin column at gpio_y
-    wire(ax, p_RST[0], gpio_y, rpu_x, gpio_y)
-    dot(ax, p_RST[0], gpio_y)
-    wire(ax, p_RST[0], p_RST[1], p_RST[0], gpio_y)
-
-    # GPIO 22 wire arrives from far left at gpio_y
-    wire(ax, -2.8, gpio_y, p_RST[0], gpio_y)
-    open_terminal(ax, -2.8, gpio_y, "GPIO 22\n(Pi pin 15)\n3.3 V logic", loc="left")
-
-    # ── GND (pin 1) ───────────────────────────────────────────────────────────
-    wire(ax, p_GND[0], p_GND[1], ic_left - 0.6, p_GND[1])
-    ground_sym(ax, ic_left - 0.6, p_GND[1])
-
-    # ── Timing network: R1, R2, C1 ───────────────────────────────────────────
-    # Vertical column at x = -1.5
-    tcol_x = -1.5
-
-    # 5V rail branch left to timing column
-    wire(ax, p_VCC[0], vcc_y, tcol_x, vcc_y)
-    dot(ax, p_VCC[0], vcc_y)
-
-    # R1: 5 V rail → DIS (pin 7)
-    wire(ax, tcol_x, vcc_y, tcol_x, p_DIS[1] + 0.6)
-    resistor(ax, tcol_x, p_DIS[1] + 0.6, tcol_x, p_DIS[1],
+    # R1: r1_top_y → DIS
+    resistor(ax, tcol_x, r1_top_y, tcol_x, p_DIS[1],
              label="R1\n1 kΩ", label_side="left")
     dot(ax, tcol_x, p_DIS[1])
-    wire(ax, tcol_x, p_DIS[1], p_DIS[0], p_DIS[1])   # across to DIS pin
+    wire(ax, tcol_x, p_DIS[1], p_DIS[0], p_DIS[1])   # → DIS pin
 
-    # R2: DIS junction → THR/TRG junction
+    # R2: DIS junction → THR junction
     resistor(ax, tcol_x, p_DIS[1], tcol_x, p_THR[1],
              label="R2\n36 kΩ", label_side="left")
     dot(ax, tcol_x, p_THR[1])
-    wire(ax, tcol_x, p_THR[1], p_THR[0], p_THR[1])   # across to THR pin
+    wire(ax, tcol_x, p_THR[1], p_THR[0], p_THR[1])   # → THR pin
 
-    # Junction wire continues down to TRG
+    # Continue wire down to TRG junction
     wire(ax, tcol_x, p_THR[1], tcol_x, p_TRG[1])
     dot(ax, tcol_x, p_TRG[1])
-    wire(ax, tcol_x, p_TRG[1], p_TRG[0], p_TRG[1])   # across to TRG pin
+    wire(ax, tcol_x, p_TRG[1], p_TRG[0], p_TRG[1])   # → TRG pin
 
-    # C1: TRG junction → GND (further left so label has room)
-    c1_x = tcol_x - 0.8
+    # C1: TRG junction → GND  (extra x offset so label has room)
+    c1_x = tcol_x - 1.2
     wire(ax, tcol_x, p_TRG[1], c1_x, p_TRG[1])
     wire(ax, c1_x, p_TRG[1], c1_x, p_TRG[1] - 0.4)
-    capacitor(ax, c1_x, p_TRG[1] - 0.65, vert=True, label="C1\n1 µF", label_side="left")
+    capacitor(ax, c1_x, p_TRG[1] - 0.65, vert=True,
+              label="C1\n1 µF", label_side="left")
     wire(ax, c1_x, p_TRG[1] - 0.9, c1_x, p_GND[1])
     ground_sym(ax, c1_x, p_GND[1])
 
-    # ── CTL (pin 5) bypass cap — well to the right of IC ────────────────────
-    c2_x = 4.5
+    # IC GND (pin 1): short stub left then ground symbol
+    wire(ax, p_GND[0], p_GND[1], p_GND[0] - 0.8, p_GND[1])
+    ground_sym(ax, p_GND[0] - 0.8, p_GND[1])
+
+    # ── RST (pin 4) pull-up + GPIO 22 ────────────────────────────────────────
+    # GPIO wire runs at y=6.5, which is above the highest timing-column point
+    # (y≈5.0) and above the IC VCC terminal (y≈5.5) — no crossings.
+    gpio_y  = 6.5
+    rpu_x   = p_RST[0]   # pull-up resistor sits on the RST wire column (x=5.1)
+    rpu_top = 8.0         # 5V terminal for pull-up
+
+    # RST pin wire goes up through the RST/GPIO junction to R_pu bottom
+    wire(ax, p_RST[0], p_RST[1], p_RST[0], gpio_y)
+    dot(ax, p_RST[0], gpio_y)                         # T-junction
+
+    # R_pu: GPIO/RST junction → 5 V terminal
+    wire(ax, p_RST[0], gpio_y, p_RST[0], gpio_y + 0.4)
+    resistor(ax, p_RST[0], gpio_y + 0.4, p_RST[0], rpu_top - 0.3,
+             label="R_pu\n10 kΩ", label_side="right")
+    wire(ax, p_RST[0], rpu_top - 0.3, p_RST[0], rpu_top)
+    open_terminal(ax, p_RST[0], rpu_top, "5 V", loc="top")
+
+    # GPIO 22 wire arrives horizontally from the left at gpio_y
+    gpio_x_start = -4.8
+    wire(ax, gpio_x_start, gpio_y, p_RST[0], gpio_y)
+    open_terminal(ax, gpio_x_start, gpio_y,
+                  "GPIO 22\n(Pi pin 15)\n3.3 V logic", loc="left")
+
+    # ── CTL (pin 5) bypass cap ────────────────────────────────────────────────
+    # Well to the right of IC, separate from R3/Q1 area
+    c2_x = 7.5
     wire(ax, p_CTL[0], p_CTL[1], c2_x, p_CTL[1])
-    wire(ax, c2_x, p_CTL[1], c2_x, p_CTL[1] - 0.35)
-    capacitor(ax, c2_x, p_CTL[1] - 0.62, vert=True,
+    wire(ax, c2_x, p_CTL[1], c2_x, p_CTL[1] - 0.4)
+    capacitor(ax, c2_x, p_CTL[1] - 0.65, vert=True,
               label="C2\n0.1 µF\n(ceramic)", label_side="right")
     wire(ax, c2_x, p_CTL[1] - 0.9, c2_x, p_GND[1])
     ground_sym(ax, c2_x, p_GND[1])
 
-    # ── OUT (pin 3) → R3 → Q1 base ──────────────────────────────────────────
-    # R3 stretches from IC OUT pin to Q1 base
-    q_cx  = 7.2   # transistor base x
-    q_cy  = p_OUT[1]   # same y as OUT pin (y = 0.8)
+    # ── OUT (pin 3) → R3 → Q1 ────────────────────────────────────────────────
+    # Q1 is far enough right that C2 (x=7.5) doesn't crowd it
+    q_cx = 9.2
+    q_cy = p_OUT[1]   # y = 0.8
 
-    wire(ax, p_OUT[0], p_OUT[1], p_OUT[0] + 0.4, p_OUT[1])
-    resistor(ax, p_OUT[0] + 0.4, p_OUT[1], q_cx - 0.2, p_OUT[1],
-             label="R3  1 kΩ", label_side="top")
-
-    base, collector, emitter = npn_transistor(ax, q_cx, q_cy, label="Q1\n2N2222")
-    wire(ax, q_cx - 0.2, p_OUT[1], base[0], base[1])
+    wire(ax, p_OUT[0], p_OUT[1], p_OUT[0] + 0.5, p_OUT[1])
+    resistor(ax, p_OUT[0] + 0.5, p_OUT[1], q_cx - 0.25, p_OUT[1],
+             label="R3   1 kΩ", label_side="top")
+    base, collector, emitter = npn_transistor(ax, q_cx, q_cy,
+                                               label="Q1\n2N2222")
+    wire(ax, q_cx - 0.25, p_OUT[1], base[0], base[1])
 
     # Emitter → GND
-    wire(ax, emitter[0], emitter[1], emitter[0], emitter[1] - 0.5)
-    ground_sym(ax, emitter[0], emitter[1] - 0.5)
+    wire(ax, emitter[0], emitter[1], emitter[0], emitter[1] - 0.6)
+    ground_sym(ax, emitter[0], emitter[1] - 0.6)
 
-    # ── Relay coil column at x = 8.8 ─────────────────────────────────────────
-    coil_x    = 8.8
-    coil_bot  = collector[1] + 0.2   # just above Q1 collector
-    coil_top  = coil_bot + 3.2       # top of coil
-    vcc_rly_y = coil_top + 1.1       # 5 V terminal for relay module
+    # ── Relay coil at x = 11.5 ───────────────────────────────────────────────
+    coil_x   = 11.5
+    coil_bot = collector[1] + 0.3
+    coil_top = coil_bot + 3.5
+    vcc_rly_y = coil_top + 0.8
 
-    # Wire from Q1 collector up to coil bottom
     wire(ax, collector[0], collector[1], collector[0], coil_bot)
     wire(ax, collector[0], coil_bot, coil_x, coil_bot)
-
-    # Relay coil (inductor symbol)
-    inductor(ax, coil_x, coil_bot, coil_x, coil_top,
-             loops=3, label="Relay\ncoil\n(5 V)", label_side="left")
-
-    # 5 V terminal at top of coil
-    wire(ax, coil_x, coil_top, coil_x, vcc_rly_y)
-    open_terminal(ax, coil_x, vcc_rly_y, "5 V (relay\nmodule VCC)", loc="top")
-
-    # Dots at coil ends
     dot(ax, coil_x, coil_bot)
     dot(ax, coil_x, coil_top)
 
-    # ── D1 flyback diode at x = 10.2 (well right of coil + its left label) ──
-    d1_x = 10.2
-    # Horizontal links from coil ends to diode column
+    inductor(ax, coil_x, coil_bot, coil_x, coil_top,
+             loops=3, label="Relay\ncoil\n(5 V)", label_side="left")
+
+    wire(ax, coil_x, coil_top, coil_x, vcc_rly_y)
+    open_terminal(ax, coil_x, vcc_rly_y, "5 V (relay\nmodule VCC)", loc="top")
+
+    # ── D1 flyback diode at x = 13.2 ─────────────────────────────────────────
+    d1_x = 13.2
     wire(ax, coil_x, coil_bot, d1_x, coil_bot)
     wire(ax, coil_x, coil_top, d1_x, coil_top)
-    # Diode (cathode up = toward 5 V, so reverse=True); label to LEFT to avoid
-    # running off the right edge
     diode(ax, d1_x, coil_bot, d1_x, coil_top,
           reverse=True, label="D1\n1N4007\n(flyback)", color="#b00")
 
-    # ── Relay NO switch + bell coil at x = 13.2 ──────────────────────────────
-    bell_x   = 13.2
-    # 12 V supply rail 1.5 units ABOVE relay VCC so they don't share the same y
-    rail_y   = vcc_rly_y + 1.5
+    # ── Relay NO contact + bell coil at x = 16.0 ─────────────────────────────
+    bell_x = 16.0
+    rail_y = vcc_rly_y + 1.5   # 12 V supply rail above relay 5 V terminal
 
-    # 12 V supply rail — rightmost section
-    open_terminal(ax, bell_x + 1.2, rail_y, "12 V DC\nsupply (+)", loc="right")
-    wire(ax, bell_x - 0.5, rail_y, bell_x + 1.3, rail_y)
+    open_terminal(ax, bell_x + 1.5, rail_y, "12 V DC\nsupply (+)", loc="right")
+    wire(ax, bell_x - 0.5, rail_y, bell_x + 1.6, rail_y)
     wire(ax, bell_x, rail_y, bell_x, rail_y - 0.4)
 
-    # Switch (relay NO contact)
     sw_top = rail_y - 0.4
-    sw_bot = sw_top - 1.0
+    sw_bot = sw_top - 1.1
     dot(ax, bell_x, sw_top, r=0.05)
-    ax.plot([bell_x, bell_x + 0.22, bell_x],
+    ax.plot([bell_x, bell_x + 0.25, bell_x],
             [sw_top, (sw_top + sw_bot) / 2, sw_bot],
             color="black", lw=1.5)
     dot(ax, bell_x, sw_bot, r=0.05)
-    ax.text(bell_x + 0.35, (sw_top + sw_bot) / 2,
+    ax.text(bell_x + 0.38, (sw_top + sw_bot) / 2,
             "Relay NO\ncontact", ha="left", va="center",
             fontsize=7.5, family="monospace")
-    wire(ax, bell_x, sw_bot, bell_x, sw_bot - 0.3)
+    wire(ax, bell_x, sw_bot, bell_x, sw_bot - 0.4)
 
-    # Bell coil
-    bell_top = sw_bot - 0.3
-    bell_bot = bell_top - 3.5
+    bell_top = sw_bot - 0.4
+    bell_bot = bell_top - 4.0
     inductor(ax, bell_x, bell_top, bell_x, bell_bot,
              loops=4, label="Bell coil\n(Type 500\nringer)", label_side="right")
     wire(ax, bell_x, bell_bot, bell_x, bell_bot - 0.5)
     open_terminal(ax, bell_x, bell_bot - 0.5, "12 V DC\nsupply (−)", loc="right")
 
-    # ── Annotation: relay coil actuates the NO contacts ─────────────────────
-    # Place BELOW the coil bottom in clear empty space to avoid crowding the
-    # supply-rail area at the top.
-    ann_y = coil_bot - 1.1
+    # ── Annotation ────────────────────────────────────────────────────────────
+    ann_y = coil_bot - 1.2
     ax.annotate("",
-                xy=(bell_x - 0.2, ann_y),
+                xy=(bell_x - 0.3, ann_y),
                 xytext=(coil_x + 0.3, ann_y),
-                arrowprops=dict(arrowstyle="-|>", color="#888", lw=1.0,
-                                connectionstyle="arc3,rad=-0.25"))
+                arrowprops=dict(arrowstyle="-|>", color="#999", lw=1.0,
+                                connectionstyle="arc3,rad=-0.2"))
     ax.text((coil_x + bell_x) / 2, ann_y - 0.25,
-            "relay coil controls NO contact (mechanical link)",
-            ha="center", va="top", fontsize=6.5, color="#777", style="italic")
+            "relay coil → NO contact (mechanical)",
+            ha="center", va="top", fontsize=6.5, color="#888", style="italic")
 
     note_box(ax, fig, [
         "555 astable frequency:  f = 1.44 ÷ ((R1 + 2×R2) × C1)  =  1.44 ÷ (73 000 × 0.000001)  ≈  19.7 Hz  (nominal 20 Hz)",
