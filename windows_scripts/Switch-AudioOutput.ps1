@@ -25,7 +25,7 @@
 .PARAMETER Toggle
     Switch to whichever of the two configured devices is NOT currently
     active, and exit immediately. No menu. This is the one to bind to a
-    keyboard shortcut for single-key operation (see windows/README.md).
+    keyboard shortcut for single-key operation (see windows_scripts/README.md).
 
 .PARAMETER Status
     Announce the current default playback device and exit.

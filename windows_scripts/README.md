@@ -74,7 +74,7 @@ never requires opening a menu at all:
    File Explorer and choose **New > Shortcut**.
 2. Set the target to:
    ```
-   powershell -ExecutionPolicy Bypass -File "C:\path\to\rotary-pi\windows\Switch-AudioOutput.ps1" -Toggle
+   powershell -ExecutionPolicy Bypass -File "C:\path\to\rotary-pi\windows_scripts\Switch-AudioOutput.ps1" -Toggle
    ```
 3. Save the shortcut to the Desktop or Start Menu.
 4. Open the shortcut's **Properties** dialog (standard Win32 dialog, fully
